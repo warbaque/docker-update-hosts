@@ -14,7 +14,7 @@ fi
 while read event; do
   if [[ "${event}" == *" container start "* ]] || [[ "${event}" == *" network disconnect "* ]]; then
     hosts_file_tmp="$(mktemp)"
-    docker container inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} {{.Name}}' $(docker container ls -q) 2>/dev/null \
+    docker container inspect -f '{{$ip := "#"}}{{range.NetworkSettings.Networks}}{{$ip = .IPAddress}}{{end}}{{$ip}} {{.Name}}' $(docker container ls -q) 2>/dev/null \
       | grep -v "^ " \
       | tr -d '/' \
       | sed -ne "/^${begin_block}$/ {p; r /dev/stdin" -e ":a; n; /^${end_block}$/ {p; b}; ba}; p" "${hosts_file}" \
